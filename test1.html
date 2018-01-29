@@ -2,21 +2,26 @@
 <html>
   <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-    <title>test.html</title>
+    <title>createDocumentFragmentFromSelector() table test</title>
     <script src="scanner.js"></script>
     <script src="parser.js"></script>
     <script src="main.js"></script>
     <script>
       function doit()
       {
-        var selector = "table[border='1']:not(#b).foo[style='width: 100%'] > tbody > tr > td[['a']] + td[['b']]";
+        var selector = "table[border='1'].myClass[style='width: 100%'] > tbody > tr > td[['a']] + td[['b']]";
         var f = document.createDocumentFragmentFromSelector(selector);
         document.body.appendChild(f)
       }
     </script>
+    <style>
+      td { background-color: red; }
+      .myClass td { background-color: lime; }
+    </style>
   </head>
   <body onload="doit()">
-    <p><br>
-    </p>
+    <p>The following table is the reference:</p>
+    <table style="width: 100%" border="1"><tbody><tr><td style="background-color: lime;">a</td><td style="background-color: lime;">b</td></tr></tbody></table>
+    <p>The following table is generated and is the test:</p>
   </body>
 </html>
