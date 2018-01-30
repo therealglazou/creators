@@ -1,5 +1,8 @@
 # Create and modify elements from Selectors
-This is just an experiment, I want to see how far I can push Selectors on such a path. **Work in progress**
+This is just an experiment, I want to see how far I can push Selectors on such a path. Use it if you like it, send pull requests if you want to extend/fix it. Provided as is under MPL2. **Work in progress**
+
+## Usage
+Just include `creators-min.js` into your html document.
 
 ## document.createDocumentFragmentFromSelector(selector)
 Takes a string containing a complex selector as argument. Returns a `DocumentFragment`.
