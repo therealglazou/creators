@@ -1,11 +1,13 @@
 # Create and modify elements from Selectors
 This is just an experiment, I want to see how far I can push Selectors on such a path. Use it if you like it, send pull requests if you want to extend/fix it. Provided as is under MPL2. **Work in progress**
 
+See [Selectors Level 4](https://drafts.csswg.org/selectors-4/) for more information on Selectors.
+
 ## Usage
 Just include `creators-min.js` into your html document.
 
 ## document.createDocumentFragmentFromSelector(selector)
-Takes a string containing a complex selector as argument. Returns a `DocumentFragment`.
+Takes a string containing a [complex selector](https://drafts.csswg.org/selectors-4/#structure) as argument. Returns a [`DocumentFragment`](https://dom.spec.whatwg.org/#interface-documentfragment).
 Selectors allowed:
 
   * type element selector (creates an element of the given type)
@@ -22,7 +24,7 @@ Selectors allowed:
 Combinators allowed: > and + only.
 
 ## document.modifyElementFromSelector(element, selector)
-Takes an Element and a string containing a compound selector as argument. Returns an Element.
+Takes an Element and a string containing a [compound selector](https://drafts.csswg.org/selectors-4/#structure) as argument. Returns an Element.
 Selectors allowed:
 
   * universal selector (no change to the type element of the element)
@@ -38,6 +40,8 @@ Selectors allowed:
     * id selector (if the element has the given id, clear it)
     * class selector (if the element has the given class, remove it)
     * attribute presence selector (if the element has the given attribute, remove it)
+
+Combinators allowed: none (yet).
 
 Not yet implemented:
   * :empty pseudo-class (clears all children of the element)
