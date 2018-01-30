@@ -74,6 +74,6 @@ transform the `td` elements in that table into `th` preserving all attributes an
 Move the 5th row of a table to the 2nd row position (not yet implemented):
 
     document.modifyElementFromSelector(
-      table.querySelector("tr:nth-of-type(5)),
+      table.querySelector( "tr:nth-of-type(5)" ),
       ":nth-of-type(2)"
     );
