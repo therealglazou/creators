@@ -3,6 +3,8 @@ This is just an experiment, I want to see how far I can push Selectors on such a
 
 See [Selectors Level 4](https://drafts.csswg.org/selectors-4/) for more information on Selectors.
 
+Nota bene: no regexp inside. Scanner and parser rulez.
+
 ## Usage
 Just include `creators-min.js` into your html document.
 
