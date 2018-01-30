@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>* in createDocumentFragmentFromSelector should throw</title>
+    <script src="../scanner.js"></script>
+    <script src="../parser.js"></script>
+    <script src="../main.js"></script>
+    <script>
+      function doit()
+      {
+        var result = document.getElementById("result");
+        var selector = "* p";
+        try {
+          var f = document.createDocumentFragmentFromSelector(selector);
+          document.body.appendChild(f);
+          result.style.backgroundColor = "red";
+        }
+        catch(e) {
+          var str = e.toString();
+          result.textContent = str
+          result.style.backgroundColor =
+             (str.substr(0, 66) == "createDocumentFragmentFromSelector: Expected Combinator instead of")
+             ? "green"
+             : "red";
+        }
+      }
+    </script>
+  </head>
+  <body onload="doit()">
+    <p>Testing that * in <code>createDocumentFragmentFromSelector()</code> throws.</p>
+    <p>The following paragraph should be green.</p>
+    <p id="result">This paragraph should be green.</p>
+  </body>
+</html>

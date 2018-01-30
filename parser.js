@@ -84,12 +84,14 @@ Combinator.prototype = {
 function TypeCreator(aTagName)
 {
   this.mTagName = aTagName;
-  this.mOtherCreators = [];
+  this.mOtherCreators = null;
+  this.mNegated = null;
 }
 
 TypeCreator.prototype = {
   mTagName: "",
-  mOtherCreators: [],
+  mOtherCreators: null,
+  mNegated: null,
 
   get type() {
     return eCREATOR_TYPE;
@@ -103,15 +105,34 @@ TypeCreator.prototype = {
     return this.mOtherCreators;
   },
 
+  set creators(val) {
+    this.mOtherCreators = val;
+  },
+
   addCreator: function() {
+    if (!this.mOtherCreators)
+      this.mOtherCreators = [];
     return Array.prototype.push.apply(this.mOtherCreators, arguments);
+  },
+
+  get negated() {
+    return this.mNegated;
+  },
+
+  setNegations: function(val) {
+    this.mNegated = val;
   },
 
   toString: function() {
     return this.value
-           + this.creators
-               .map(function(e) { return e.toString(); })
-               .join("");
+           + (this.creators
+             ?  this.creators
+                  .map(function(e) { return e.toString(); })
+                  .join("")
+             : "")
+           + (this.negated
+             ? ":not(" + this.negated.toString() + ")"
+             : "");
   }
 };
 
@@ -264,6 +285,8 @@ CreatorsParser.prototype = {
   kEXPECTED_SIMPLE_CREATOR: "Expected Type, Id, Class, Pseudoclass or Attribute creator.",
   kEXPECTED_COMBINATOR: "Expected Combinator instead of ",
   kSYNTAX_ERROR: "Syntax Error.",
+  kNESTED_NEGATION: "Cannot have :not() inside another :not().",
+  kTYPE_IN_NEGATION: "Type creator not allowed inside :not().",
 
   currentToken: function() {
     return this.mToken;
@@ -309,27 +332,31 @@ CreatorsParser.prototype = {
     throw aCallerName + ": " + aError;
   },
   
-  parse: function(aCallerName) {
+  parse: function(aCallerName, aIsNegation) {
     var token = this.getToken(true, true);
-    if (!token.isNotNull()) {
+    if (!token.isNotNull()
+        || (aIsNegation && token.isSymbol(")"))) {
       this.fireError(aCallerName, this.kUNEXPECTED_CREATOR_END)
     }
 
     var creator = new Creator();
 
     // do we start with a combinator?
-    if(token.isSymbol(">") || token.isSymbol("+")) {
+    if(!aIsNegation &&
+       (token.isSymbol(">") || token.isSymbol("+"))) {
       var combinator = new Combinator(token.value);
       creator.push(combinator);
 
       token = this.getToken(true, true);
-      if (!token.isNotNull()) {
+      if (!token.isNotNull()
+          || (aIsNegation && token.isSymbol(")"))) {
         // we need something after the combinator
         this.fireError(aCallerName, this.kUNEXPECTED_CREATOR_END)
       }
     }
 
-    while (token.isNotNull()) {
+    while (token.isNotNull()
+           && (!aIsNegation || !token.isSymbol(")"))) {
       var typeCreator = null;
 
       if (token.isSymbol("*")) {
@@ -338,6 +365,8 @@ CreatorsParser.prototype = {
         token = this.getToken(false, true);
       }
       else if (token.isIdent()) {
+        if (aIsNegation)
+          this.fireError(aCallerName, this.kTYPE_IN_NEGATION);
         typeCreator = new TypeCreator(token.value);
         creator.push(typeCreator);
         token = this.getToken(false, true);
@@ -382,7 +411,19 @@ CreatorsParser.prototype = {
           else if (token.isFunction()) {
             var name = token.value.substr(0, token.value.length - 1);
             switch (name) {
-              case "not": 
+              case "not":
+                {
+                  if (aIsNegation)
+                    this.fireError(aCallerName, this.kNESTED_NEGATION);
+                  var negated = this.parse(aCallerName, true);
+                  if (typeCreator.negated) {
+                    typeCreator.negated.creators = typeCreator.negated.creators.concat(negated.list[0].creators);
+                  }
+                  else
+                    typeCreator.setNegations(negated.list[0]);
+                  token = this.getToken(false, true);
+                }
+                break;
             }
           }
           else
@@ -468,7 +509,8 @@ CreatorsParser.prototype = {
   
         token = this.getToken(true, true);
       }
-      else if (!token.isNotNull())
+      else if (!token.isNotNull()
+               || (aIsNegation && token.isSymbol(")")))
         return creator;
       else
         this.fireError(aCallerName, this.kEXPECTED_COMBINATOR + " " + token.value)
