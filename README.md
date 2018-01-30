@@ -55,4 +55,25 @@ Not yet implemented:
   * :first-of-type (similar to :nth-of-type(1))
   * :last-of-type (similar to :nth-last-of-type(1))
   * :only-of-type (removes all other elements of same type from its parent's children)
-  
+
+## Examples
+
+Create a full-width 1x2 table of class `modern` and append it to the current document's body:
+
+    var selector = "table[border='1'].modern[style='width: 100%'] > tbody > tr > td[['a']] + td[['b']]";
+    var table = document.createDocumentFragmentFromSelector(selector);
+    document.body.appendChild(table);
+
+transform the `td` elements in that table into `th` preserving all attributes and contents
+
+    table.querySelectorAll("td")
+         .forEach(function(e) {
+             document.modifyElementFromSelector(e, "th");
+           });
+
+Move the 5th row of a table to the 2nd row position (not yet implemented):
+
+    document.modifyElementFromSelector(
+      table.querySelector("tr:nth-of-type(5)),
+      ":nth-of-type(2)"
+    );
