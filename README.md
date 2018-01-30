@@ -46,7 +46,7 @@ Selectors allowed:
 Combinators allowed: none (yet).
 
 Not yet implemented:
-  * :empty pseudo-class (clears all children of the element)
+  * :empty pseudo-class (deletes all children of the element)
   * :nth-child(n) (moves the element to nth element child position of its parent)
   * :nth-last-child (moves the element to nth last element child position of its parent)
   * :first-child (similar to :nth-child(1))
